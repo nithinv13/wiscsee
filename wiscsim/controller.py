@@ -123,6 +123,14 @@ class Controller(object):
                                 self.n_pages_per_plane,
                                 self.n_pages_per_block]
 
+        print 'Hardware configuration'
+        print 'n_channels_per_device = ' + str(self.n_channels_per_dev)
+        print 'n_packages_per_channel = ' + str(self.n_packages_per_channel)
+        print 'n_chips_per_package = ' + str(self.n_chips_per_package)
+        print 'n_planes_per_chip = ' + str(self.n_planes_per_chip)
+        print 'n_blocks_per_plane = ' + str(self.n_blocks_per_plane)
+        print 'n_pages_per_block = ' + str(self.n_pages_per_block)
+
         self.channels = [Channel(self.env, conf, i)
                 for i in range( self.n_channels_per_dev)]
 
@@ -161,6 +169,9 @@ class Controller(object):
             flash_req = create_flashrequest(machine_page_addr, op = op)
             ret_requests.append(flash_req)
 
+        # print 'in get flash request for ppns'
+        # print 'operation that is going to happen is ' + str(op)
+        # print 'address is ' + machine_page_addr.__str__()
         return ret_requests
 
     def physical_to_machine_page(self, page_no):

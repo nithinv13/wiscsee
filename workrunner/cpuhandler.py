@@ -2,6 +2,7 @@ import glob
 import os
 
 def get_possible_cpus():
+    return [0, 1, 2]
     f = open("/sys/devices/system/cpu/possible", 'r')
     line = f.readline()
     f.close()
@@ -18,7 +19,7 @@ def get_possible_cpus():
         else:
             cpus.append(int(item))
 
-    return cpus
+    #return cpus
 
 def get_available_cpu_dirs():
     "Counting dirs is more accurate than */cpu/possible, at least on emulab"
@@ -27,6 +28,7 @@ def get_available_cpu_dirs():
     return cpudirs
 
 def get_online_cpuids():
+    return [0, 1, 2]
     with open('/sys/devices/system/cpu/online', 'r') as f:
         line = f.readline().strip()
 

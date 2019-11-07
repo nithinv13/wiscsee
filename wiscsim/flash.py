@@ -43,13 +43,16 @@ class Flash(object):
 
     def page_read(self, pagenum, cat):
         self.recorder.count_me(cat, 'physical_read')
+        self.recorder.record_physical_page_read(pagenum)
 
         if self.store_data == True:
             content = self.data.get(pagenum, None)
             return content
 
     def page_write(self, pagenum, cat, data = None):
+        # print 'Doing physical page write for ppn ' + str(pagenum)
         self.recorder.count_me(cat, 'physical_write')
+        self.recorder.record_physical_page_write(pagenum)
 
         # we only put data to self.data when the caller specify data
         if self.store_data == True:
@@ -59,6 +62,7 @@ class Flash(object):
     def block_erase(self, blocknum, cat):
         # print 'block_erase', blocknum, cat
         self.recorder.count_me(cat, 'phy_block_erase')
+        self.recorder.record_physical_block_erase(blocknum)
 
         if self.store_data == True:
             ppn_start, ppn_end = self.conf.block_to_page_range(blocknum)

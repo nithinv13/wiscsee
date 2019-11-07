@@ -55,6 +55,7 @@ class NoOp(Workload):
 
 class SimpleRandReadWrite(Workload):
     def __init__(self, confobj, workload_conf_key = None):
+        print 'coming into simpleandreadwrite'
         super(SimpleRandReadWrite, self).__init__(confobj, workload_conf_key)
 
     def run(self):

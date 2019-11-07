@@ -15,6 +15,7 @@ from config_helper import experiment
 
 class Test_TraceOnly(unittest.TestCase):
     def test_run(self):
+        print 'in test_run for Test_TraceOnly'
         class LocalExperiment(experiment.Experiment):
             def setup_workload(self):
                 self.conf['workload_class'] = "SimpleRandReadWrite"
@@ -31,6 +32,7 @@ class Test_TraceOnly(unittest.TestCase):
 
 class Test_TraceAndSimulateDFTLDES(unittest.TestCase):
     def test_run(self):
+        print 'in test_run for Test_TraceAndSimulateDFTLDES'
         class LocalExperiment(experiment.Experiment):
             def setup_workload(self):
                 self.conf['workload_class'] = "SimpleRandReadWrite"
@@ -45,6 +47,7 @@ class Test_TraceAndSimulateDFTLDES(unittest.TestCase):
 
 class Test_TraceAndSimulateNKFTL(unittest.TestCase):
     def test_run(self):
+        print 'in test_run for Test_TraceAndSimulateNKFTL'
         class LocalExperiment(experiment.Experiment):
             def setup_workload(self):
                 self.conf['workload_class'] = "SimpleRandReadWrite"
@@ -58,6 +61,8 @@ class Test_TraceAndSimulateNKFTL(unittest.TestCase):
 
 
 class Test_SimulateForSyntheticWorkload(unittest.TestCase):
+    def test_run(self):
+        print 'in Test_SimulateForSyntheticWorkload'
         class LocalExperiment(experiment.Experiment):
             def setup_workload(self):
                 self.conf['workload_src'] = config.LBAGENERATOR
@@ -80,6 +85,7 @@ class Test_SimulateForSyntheticWorkload(unittest.TestCase):
 
 class TestUsingExistingTraceToSimulate(unittest.TestCase):
     def test_run(self):
+        print 'in test_run in TestUsingExistingTraceToSimulate'
         class LocalExperiment(experiment.Experiment):
             def setup_workload(self):
                 self.conf["workload_src"] = config.LBAGENERATOR
@@ -91,9 +97,14 @@ class TestUsingExistingTraceToSimulate(unittest.TestCase):
 
         para = experiment.get_shared_nolist_para_dict("test_exp_TestUsingExistingTraceToSimulate_jj23hx", 1*GB)
         para.update({
-            'ftl': "dftldes",
-            "mkfs_path": "./tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim-mkfs.txt",
-            "ftlsim_path": "./tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim.txt",
+            'ftl': "nkftl2",
+            "mkfs_path": "../tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim-mkfs.txt",
+            "ftlsim_path": "../tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim.txt",
+            'n_channels_per_dev': 1,
+            'n_packages_per_channel': 2,
+            'n_chips_per_package': 2,
+            'n_planes_per_chip': 2,
+            'n_pages_per_block': 64
             })
 
         Parameters = collections.namedtuple("Parameters", ','.join(para.keys()))

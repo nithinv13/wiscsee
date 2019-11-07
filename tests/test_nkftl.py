@@ -18,6 +18,7 @@ TDATA = 'TDATA'
 TLOG = 'TLOG'
 
 def create_config():
+    print 'creating config for nkftl test'
     conf = wiscsim.nkftl2.Config()
 
     conf['flash_config']['n_pages_per_block'] = 8
@@ -198,6 +199,7 @@ class TestNkftl(AssertFinishTestCase, RWMixin):
 
 
     def write_and_check(self, ftl, lpns, env):
+        print 'lpns that are programmed for check from test are ' + str(lpns)
         data_mirror = {}
         for lpn in lpns:
             data = self.randomdata(lpn)

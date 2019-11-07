@@ -92,6 +92,7 @@ class TestWorkflow(unittest.TestCase):
         self.assertTrue(os.path.exists(datapath))
 
     def test_simulation(self):
+        print 'In test_simulation in test workflow'
         conf = create_config()
 
         ctrl_event = ControlEvent(OP_ENABLE_RECORDER)
@@ -101,6 +102,7 @@ class TestWorkflow(unittest.TestCase):
         wf.run_simulator([ctrl_event, event])
 
     def test_on_fs_run_and_sim(self):
+        print 'test_on_fs_run_and_sim in test workflow'
         conf = create_config()
         on_fs_config(conf)
         conf['enable_blktrace'] = True

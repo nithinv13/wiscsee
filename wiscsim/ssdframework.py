@@ -53,6 +53,7 @@ class Ssd(SsdBase):
         self._snapshot_valid_ratios = self.conf['snapshot_valid_ratios']
         self._snapshot_erasure_count_dist = self.conf['snapshot_erasure_count_dist']
         self._snapshot_interval = self.conf['snapshot_interval']
+        # self._snapshot_interval = 1000
         self._snapshot_user_traffic = True
 
         self._do_wear_leveling = self.conf['do_wear_leveling']
@@ -85,8 +86,13 @@ class Ssd(SsdBase):
             self.ncq.slots.release(req)
 
     def _process(self, pid):
+        print 'getting process for pid ' + str(pid)
+        host_events = []
         for req_i in itertools.count():
             host_event = yield self.ncq.queue.get()
+            host_events += [host_event.__str__()]
+            # print 'Host event received: ' + host_event.__str__()
+            sys.stdout.flush()
 
             slot_req = self.ncq.slots.request()
             yield slot_req
@@ -213,14 +219,17 @@ class Ssd(SsdBase):
                     yield self.env.process(self.ftl.clean(forced=True, merge=False))
 
             elif operation == OP_READ:
+                # print 'got read operation'
                 yield self.env.process(
                     self.ftl.read_ext(host_event.get_lpn_extent(self.conf)))
 
             elif  operation == OP_WRITE:
+                # print 'got write operation'
                 yield self.env.process(
                     self.ftl.write_ext(host_event.get_lpn_extent(self.conf)))
 
             elif  operation == OP_DISCARD:
+                print 'discard operation'
                 yield self.env.process(
                     self.ftl.discard_ext(host_event.get_lpn_extent(self.conf)))
 
@@ -291,6 +300,7 @@ class Ssd(SsdBase):
 
     def run(self):
         procs = []
+        print 'the value of n_processes is ' + str(self.n_processes)
         for i in range(self.n_processes):
             p = self.env.process( self._process(i) )
             procs.append(p)
@@ -307,6 +317,7 @@ class Ssd(SsdBase):
         p = self.env.process( self._user_traffic_size_snapshot_process() )
         procs.append(p)
 
+        print 'added the procs' + str(procs)
         yield simpy.events.AllOf(self.env, procs)
 
 
@@ -489,6 +500,4 @@ class SSDFramework(object):
             self.recorder.result_dict['workload_start_time']
         print 'blkparse_duration', self.recorder.result_dict.get(
                 'blkparse_duration', None)
-
-
 

@@ -2,6 +2,8 @@
 import abc
 import argparse
 import random
+import time
+
 import simpy
 import sys
 import os
@@ -68,11 +70,14 @@ class SimulatorDESNew(Simulator):
                 self.host.get_ncq(), self.recorder)
 
     def run(self):
+        print 'going to host run'
         self.env.process(self.host.run())
+        print 'going to ssd run'
         self.env.process(self.ssd.run())
 
         self.env.run()
 
+        #time.sleep(10)
         self.record_post_run_stats()
 
     def get_sim_type(self):

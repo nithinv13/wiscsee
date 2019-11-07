@@ -250,7 +250,7 @@ class MappingBase(object):
         self.recorder = recorderobj
         self.global_helper = global_helper_obj
 
-
+# Logical block number to physical block number mapping
 class DataBlockMappingTable(MappingBase):
     def __init__(self, confobj, recorderobj, global_helper_obj):
         super(DataBlockMappingTable, self).__init__(confobj, recorderobj,
@@ -370,9 +370,17 @@ class LogGroup2(object):
         # each channel has a current block or None
         self.log_channels = [[] for i in range(self.n_channels)]
         self._cur_channel = random_channel_id(self.conf.n_channels_per_dev)
+        # print 'Initializing logGroup2'
+        # print 'Random channel id got is : ' + str(self._cur_channel)
         self._cur_channel_used_pages = 0
 
         self._page_map = bidict.bidict() # lpn->ppn
+
+    def get_page_map(self):
+        return self._page_map
+
+    def get_current_channel(self):
+        return self._cur_channel
 
     def update_block_use_time(self, blocknum):
         pass
@@ -406,6 +414,7 @@ class LogGroup2(object):
     def cur_blocks(self):
         ret = []
         for channel_id in range(self.n_channels):
+            # log_channels has current log blocks for each channel
             for cur_block in self.log_channels[channel_id]:
                 ret.append(cur_block)
         return ret
@@ -1838,12 +1847,14 @@ class Ftl(ftlbuilder.FtlBuilder):
 
 
     def lba_write(self, lpn, data=None):
+        print 'in lba write'
         yield self.env.process(
                 self.write_ext(Extent(lpn_start=lpn, lpn_count=1), [data]))
 
         yield self.env.process(self.garbage_collector.clean())
 
     def write_ext(self, extent, data=None):
+        # print 'in write ext for nkftl'
         req_size = extent.lpn_count * self.conf.page_size
         self.recorder.add_to_general_accumulater('traffic', 'write', req_size)
         self.written_bytes += req_size
@@ -1864,14 +1875,19 @@ class Ftl(ftlbuilder.FtlBuilder):
             data_group_procs.append(p)
 
         yield simpy.AllOf(self.env, data_group_procs)
+        # for key in self.log_mapping_table.log_group_info:
+        #     print 'log mapping table'
+        #     print key, self.log_mapping_table.log_group_info[key].get_current_channel()
 
     def _block_iter_of_extent(self, extent):
         block_start, _ = self.conf.page_to_block_off(extent.lpn_start)
         block_last, _ = self.conf.page_to_block_off(extent.last_lpn())
-
+        # print 'start block is ' + str(block_start)
+        # print 'last block is ' + str(block_last)
         return range(block_start, block_last + 1)
 
     def write_data_group(self, extent, data=None):
+        # print 'in write data group in nkftl2'
         """
         extent must not go across data groups
 
@@ -1899,6 +1915,8 @@ class Ftl(ftlbuilder.FtlBuilder):
                 n=loop_ext.lpn_count,
                 strip_unit_size=self.conf['stripe_size'])
 
+            # print 'ppns that are being programmed are ' + str(ppns)
+
             n_ppns = len(ppns)
             mappings = OrderedDict(zip(loop_ext.lpn_iter(), ppns))
             assert len(mappings) == n_ppns
@@ -1910,7 +1928,7 @@ class Ftl(ftlbuilder.FtlBuilder):
                     self._write_log_ppns(mappings, data=loop_data))
 
             if n_ppns < loop_ext.lpn_count:
-                # we cannot find vailable pages in log blocks
+                # we cannot find available pages in log blocks
                 for block_id, req in reversed(zip(block_ids, reqs)):
                     self.logical_block_locks.release_request(block_id, req)
 
@@ -1946,6 +1964,7 @@ class Ftl(ftlbuilder.FtlBuilder):
                 print lpn, '->', ppn
 
     def write_logical_block(self, extent, data=None):
+        print 'Inside write logical block'
         block_id, _ = self.conf.page_to_block_off(extent.lpn_start)
         req = self.logical_block_locks.get_request(block_id)
         yield req
@@ -2016,6 +2035,10 @@ class Ftl(ftlbuilder.FtlBuilder):
 
         # block pool
         # no need to handle because it has been handled when we got the ppns
+
+        # print 'in _write_log_ppns'
+        # print 'mappings present are'
+        # print mappings.__str__()
 
         # flash
         for i, ppn in enumerate(mappings.values()):

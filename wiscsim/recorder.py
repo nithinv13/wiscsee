@@ -1,4 +1,8 @@
 import collections
+import datetime
+import threading
+import json
+import time
 import os
 import pprint
 import sys
@@ -53,11 +57,22 @@ class Recorder(object):
             'read_trans': 'background',
             'prog_trans': 'background'}
 
+        self.physical_page_reads = {}
+        self.physical_page_writes = {}
+        self.physical_block_erases = {}
+
+        self.file_name = "/Users/nithinvenkatesh/Documents/IndependentStudy/physical_page_stats.txt"
+        # self.background_writer = threading.Thread(name='record_writer',
+        #                                           target=self.write_physical_rwe_stats_to_file)
+        # self.background_writer.daemon = True
+        # self.background_writer.start()
+
     def close(self):
         self.__close_log_file()
         self.__save_accumulator()
         self.__save_result_dict()
         self._close_file_pool()
+        self._wirte_physical_page_stats_one_time()
 
     def enable(self):
         print "....Recorder is enabled...."
@@ -236,5 +251,47 @@ class Recorder(object):
     def error(self, *args):
         if self.verbose_level >= 0:
             self.__write_log('ERROR', *args)
+
+    def record_physical_page_write(self, page_num):
+        if page_num in self.physical_page_writes:
+            self.physical_page_writes[page_num] += 1
+        else:
+            self.physical_page_writes[page_num] = 1
+
+    def record_physical_page_read(self, page_num):
+        if page_num in self.physical_page_reads:
+            self.physical_page_reads[page_num] += 1
+        else:
+            self.physical_page_reads[page_num] = 1
+
+    def record_physical_block_erase(self, block_num):
+        if block_num in self.physical_block_erases:
+            self.physical_block_erases[block_num]  += 1
+        else:
+            self.physical_block_erases[block_num] = 1
+
+    def _wirte_physical_page_stats_one_time(self):
+        with open(self.file_name, 'wa') as file1:
+            file1.write(' writes: ' + str(self.physical_page_writes))
+            file1.write(' reads:' + str(self.physical_page_reads))
+            file1.write(' erases:' + str(self.physical_block_erases))
+
+    def write_physical_rwe_stats_to_file(self):
+        time_stamp = 1
+        with open(self.file_name, 'wa') as file1:
+            while True:
+                # json.dump({'time': time_stamp}, file1)
+                # time_stamp += 1
+                # json.dump({'writes': self.physical_page_writes}, file1)
+                # json.dump({'reads': str(self.physical_page_reads)}, file1)
+                # json.dump({'erases', str(self.physical_block_erases)}, file1)
+                # file1.flush()
+                file1.write('time: ' + str(time_stamp))
+                time_stamp += 1
+                file1.write(' writes: ' + str(self.physical_page_writes))
+                file1.write(' reads:' + str(self.physical_page_reads))
+                file1.write(' erases:' + str(self.physical_block_erases))
+                time.sleep(1)
+
 
 

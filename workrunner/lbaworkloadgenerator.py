@@ -1,10 +1,12 @@
 import abc
 import random
+import sys
 
 import config
 import workload
 from wiscsim import hostevent
 from commons import *
+import traceback
 
 from pyreuse.general.zipf import ZipfGenerator
 
@@ -302,6 +304,7 @@ class AccessesWithDist(LBAWorkloadGenerator):
         self.space_size = self.conf['AccessesWithDist']['space_size']
         self.skew_factor = self.conf['AccessesWithDist']['skew_factor']
         self.zipf_alpha = self.conf['AccessesWithDist']['zipf_alpha']
+        # The lbabytes value will be 1024 corresponding to 1GB
         self.lbabytes = self.conf['dev_size_mb'] * MB
 
 
@@ -412,6 +415,9 @@ class BarrierGen(object):
 
 class BlktraceEvents(LBAWorkloadGenerator):
     def __init__(self, confobj):
+
+        print 'init of Blktraceevents'
+        sys.stdout.flush()
         if not isinstance(confobj, config.Config):
             raise TypeError("confobj is not config.Config. It is {}".
                 format(type(confobj).__name__))
@@ -427,26 +433,56 @@ class BlktraceEvents(LBAWorkloadGenerator):
         if str(self.stop_on_bytes).lower() in ('inf', 'infinity', 'infinit'):
             self.stop_on_bytes = float('inf')
 
+    def print_events(self, events):
+        for event in events:
+            print event
+            sys.stdout.flush()
+
     def __iter__(self):
+
+        print 'in __iter__ in lbaworkloadgenerator'
+        #traceback.print_stack()
+        sys.stdout.flush()
+
         barriergen = BarrierGen(self.conf.ssd_ncq_depth())
 
         yield hostevent.ControlEvent(operation=OP_DISABLE_RECORDER)
 
+        mkfs_events = []
+
         # mkfs events
         for event in self.prepfs_events():
+            mkfs_events += [event.__str__()]
             yield event
 
+        workload_events = []
         # target workload event
         for event in self.target_workload_events():
+            workload_events += [event.__str__()]
             yield event
 
+        gc_events = []
         # may send gc trigger
         for event in self.gc_event():
+            gc_events += [event.__str__()]
             yield event
 
+        barrier_events = []
         for req in barriergen.barrier_events():
+            barrier_events += [req.__str__()]
             yield req
         yield hostevent.ControlEvent(operation=OP_REC_BW)
+
+        print 'Going out of blocktracevents'
+        # print 'MKFS event count = ' + str(len(mkfs_events))
+        # self.print_events(mkfs_events)
+        # print 'Workload event count = ' + str(len(workload_events))
+        # self.print_events(workload_events)
+        # print 'GC events count = ' + str(len(gc_events))
+        # self.print_events(gc_events)
+        # print 'Barrier events count = ' + str(len(barrier_events))
+        # self.print_events(barrier_events)
+
 
     def prepfs_events(self):
         prepfs_line_iter = hostevent.FileLineIterator(self.mkfs_event_path)

@@ -1,3 +1,5 @@
+import sys
+
 from commons import *
 from ftlsim_commons import *
 import hostevent
@@ -17,12 +19,21 @@ class Host(object):
         return self._ncq
 
     def _process(self):
+        # event_count = 0
+        # for event in self.event_iter:
+        #     event_count += 1
+        #
+        # print 'In host process'
+        # print 'The total number of events present are ' + str(event_count)
+        # sys.stdout.flush()
+
         for event in self.event_iter:
             if isinstance(event, hostevent.Event) and event.offset < 0:
                 # due to padding, accesing disk head will be negative.
                 continue
 
             if event.action == 'D':
+                # print 'adding the event' + str(event)
                 yield self._ncq.queue.put(event)
 
     def run(self):

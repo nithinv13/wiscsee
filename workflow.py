@@ -10,6 +10,7 @@ import workrunner
 
 
 def run_workflow(conf):
+    print 'getting the following conf in workflow ' + str(conf)
     wf = Workflow(conf)
     wf.run()
 
@@ -63,6 +64,7 @@ class Workflow(object):
 
         simulator = create_simulator(self.conf['simulator_class'], self.conf,
                 event_iter )
+        print 'going to run simulator ' + self.conf['simulator_class']
         simulator.run()
 
 

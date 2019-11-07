@@ -99,6 +99,7 @@ class Experiment(object):
         self.conf['enable_simulation'] = False
 
     def run(self):
+        print 'in misc test run'
         utils.set_exp_metadata(self.conf, save_data = False,
                 expname = 'tmp',
                 subexpname = 'subtmp')
