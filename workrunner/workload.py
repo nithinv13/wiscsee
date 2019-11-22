@@ -109,7 +109,7 @@ class RedisWorkload(Workload):
 
     def run(self):
         mnt = self.conf["fs_mount_point"]
-        cmd = "./Users/nithinvenkatesh/Documents/IndependentStudy/YCSB/bin/ycsb load redis -s -P workloads/workloada -p redis.host=127.0.0.1 -p redis.port=6379 > outputLoad.txt"
+        cmd = "./YCSB/bin/ycsb load redis -s -P workloads/workloada -p redis.host=127.0.0.1 -p redis.port=7000 > outputLoad.txt"
         print cmd
         subprocess.call(cmd, shell=True)
         subprocess.call("sync")

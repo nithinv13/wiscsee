@@ -123,8 +123,8 @@ class TestRedisWorkload(unittest.TestCase):
                                                       lbabytes=1024 * MB)
         para.update(
             {
-                'device_path': "/Users/nithinvenkatesh/Documents/IndependentStudy/dev/loop0",
-                "tmpfs_mount_point": "/Users/nithinvenkatesh/Documents/IndependentStudy/mnt/tmpfs",
+                'device_path': "/dev/loop0",
+                "tmpfs_mount_point": "/mnt/tmpfs",
                 'ftl': 'nkftl2',
                 'enable_simulation': True,
                 'dump_ext4_after_workload': True,
