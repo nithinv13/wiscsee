@@ -19,13 +19,13 @@ class Host(object):
         return self._ncq
 
     def _process(self):
-        # event_count = 0
-        # for event in self.event_iter:
-        #     event_count += 1
-        #
-        # print 'In host process'
-        # print 'The total number of events present are ' + str(event_count)
-        # sys.stdout.flush()
+        event_count = 0
+        for event in self.event_iter:
+            event_count += 1
+
+        print 'In host process'
+        print 'The total number of events present are ' + str(event_count)
+        sys.stdout.flush()
 
         for event in self.event_iter:
             if isinstance(event, hostevent.Event) and event.offset < 0:

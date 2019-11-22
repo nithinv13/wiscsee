@@ -60,8 +60,11 @@ class Recorder(object):
         self.physical_page_reads = {}
         self.physical_page_writes = {}
         self.physical_block_erases = {}
+        self.physical_page_stats = collections.defaultdict(dict)
 
-        self.file_name = "/Users/nithinvenkatesh/Documents/IndependentStudy/physical_page_stats.txt"
+        self.writes_file_name = "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_physical_writes.txt"
+        self.reads_file_name = "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_physical_reads.txt"
+        self.erases_file_name = "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_physical_erases.txt"
         # self.background_writer = threading.Thread(name='record_writer',
         #                                           target=self.write_physical_rwe_stats_to_file)
         # self.background_writer.daemon = True
@@ -264,6 +267,8 @@ class Recorder(object):
         else:
             self.physical_page_reads[page_num] = 1
 
+
+
     def record_physical_block_erase(self, block_num):
         if block_num in self.physical_block_erases:
             self.physical_block_erases[block_num]  += 1
@@ -271,10 +276,15 @@ class Recorder(object):
             self.physical_block_erases[block_num] = 1
 
     def _wirte_physical_page_stats_one_time(self):
-        with open(self.file_name, 'wa') as file1:
+        with open(self.writes_file_name, 'w') as file1:
             file1.write(' writes: ' + str(self.physical_page_writes))
+            file1.close()
+        with open(self.reads_file_name, 'w') as file1:
             file1.write(' reads:' + str(self.physical_page_reads))
+            file1.close()
+        with open(self.erases_file_name, 'w') as file1:
             file1.write(' erases:' + str(self.physical_block_erases))
+            file1.close()
 
     def write_physical_rwe_stats_to_file(self):
         time_stamp = 1

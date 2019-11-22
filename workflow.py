@@ -59,9 +59,11 @@ class Workflow(object):
         return event_iter
 
     def _run_simulator(self, event_iter):
+        print 'enable simulation set to: ' + str(self.conf['enable_simulation'])
         if self.conf['enable_simulation'] is not True:
             return
 
+        print 'Coming to _run_simulator'
         simulator = create_simulator(self.conf['simulator_class'], self.conf,
                 event_iter )
         print 'going to run simulator ' + self.conf['simulator_class']

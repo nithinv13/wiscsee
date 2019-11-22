@@ -158,6 +158,8 @@ class WorkloadRunner(object):
                 fs_obj.sysfs_setup(opt_name, value)
 
     def __set_linux_ncq_depth(self):
+        print 'Device type'
+        print str(self.conf.device_type)
         if self.conf.device_type == 'real':
             device_name = self.conf.get_device_name_no_num()
             utils.set_linux_ncq_depth(device_name,

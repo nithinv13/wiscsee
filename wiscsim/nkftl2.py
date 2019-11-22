@@ -643,6 +643,9 @@ class LogMappingTable(MappingBase):
         # dgn -> log block info of data group (LogGroup2)
         self.log_group_info = {}
 
+    def get_mapping_table(self):
+        return self.log_group_info
+
     def find_group_by_pbn(self, pbn):
         dgn = None
         loggroup = None
@@ -879,6 +882,7 @@ class GarbageCollector(object):
     def __init__(self, confobj, block_pool, flashobj, oobobj, recorderobj,
             translatorobj, global_helper_obj, log_mapping, data_block_mapping,
             simpy_env, des_flash, logical_block_locks):
+        print 'Initializing garbage collector for NKFTL2'
         self.conf = confobj
         self.flash = flashobj
         self.oob = oobobj
@@ -905,6 +909,7 @@ class GarbageCollector(object):
         self.gc_time_recorded = False
 
     def clean(self, forced=False, merge=True):
+        print 'In clean in nkftl2'
         req = self._cleaning_lock.request()
         yield req
 
@@ -922,6 +927,7 @@ class GarbageCollector(object):
         self._cleaning_lock.release(req)
 
     def clean_data_group(self, data_group_no, merge=True):
+        # print 'In clean_data_group in nkftl2'
         """
         This function will merge the contents of all log blocks associated
         with data_group_no into data blocks. After calling this function,
@@ -966,6 +972,7 @@ class GarbageCollector(object):
         self._datagroup_gc_locks.release_request(data_group_no, req)
 
     def clean_log_block(self, log_pbn, data_group_no, tag, merge=True):
+        # print 'In clean_log_block in nkftl2'
         """
         0. If not valid page in log_pbn, simply erase and free it
         1. Try switch merge
@@ -1029,6 +1036,7 @@ class GarbageCollector(object):
         self._cleaner_res.release(req)
 
     def full_merge(self, log_pbn):
+        # print 'Doing a full merge now in nkftl2'
         """
         This log block (log_pbn) could contain pages from many different
         logical blocks in the same data group. For each logical block we
@@ -1245,6 +1253,7 @@ class GarbageCollector(object):
         return True, logical_block, last_valid_ppn + 1 - ppn_start
 
     def partial_merge(self, log_pbn, lbn, first_free_offset):
+        print 'Doing a partial merge in nkftl2'
         """
         The lpn in the kth-nth pages:
         if not exist:
@@ -1430,6 +1439,7 @@ class GarbageCollector(object):
         return True, logical_block
 
     def switch_merge(self, log_pbn, logical_block):
+        print 'Doing a switch merge in nkftl2'
         """
         Merge log_pbn, which corresponds to logical_block
 
@@ -1870,6 +1880,7 @@ class Ftl(ftlbuilder.FtlBuilder):
                 data_group_data = None
             else:
                 data_group_data = self._sub_ext_data(data, extent, data_group_ext)
+            # print data_group_ext
             p = self.env.process(
                     self.write_data_group(data_group_ext, data=data_group_data))
             data_group_procs.append(p)
@@ -1935,7 +1946,11 @@ class Ftl(ftlbuilder.FtlBuilder):
                 gc_req = self.garbage_collector._cleaning_lock.request()
                 yield gc_req
 
-                print 'start cleaning for write_ext()'
+                # print 'start cleaning for write_ext()'
+
+                # log_map_table = self.log_mapping_table.get_mapping_table()
+                # for key in log_map_table:
+                #     print key, len(log_map_table[key].get_page_map()), log_map_table[key].get_current_channel()
 
                 yield self.env.process(
                     self.garbage_collector.clean_data_group(data_group_no))

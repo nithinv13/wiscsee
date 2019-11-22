@@ -149,6 +149,7 @@ class Config(dict):
         return os.path.join(self['result_dir'], 'ftlsim.out')
 
     def set_flash_num_blocks_by_bytes(self, size_byte):
+        print 'Setting flash blocks here'
         nblocks = size_byte / \
             (self['flash_page_size'] * self['flash_npage_per_block'])
 
@@ -157,6 +158,7 @@ class Config(dict):
 
         print 'WARNING: set_flash_num_blocks_by_bytes() cannot set to '\
             'exact bytes. rem:', rem
+        print 'The number of flash blocks set are: ' + str(nblocks)
         self['flash_num_blocks'] = nblocks
 
 
@@ -247,7 +249,6 @@ class Config(dict):
             "linux_io_scheduler" : 'noop',
             "dev_size_mb"      : None,
             "tmpfs_mount_point"     : "/mnt/tmpfs",
-
             "device_path"           : "/dev/loop0", # or sth. like /dev/sdc1
             "dev_padding"      : 8*MB,
 
@@ -481,6 +482,8 @@ class ConfigNewFlash(Config):
         """
         This function will only change n_blocks_per_plane
         """
+        print 'The size of SSD is: ' + str(float(size_byte/MB)) + ' MB'
+        print 'Setting number of blocks here'
         pagesize = self['flash_config']['page_size']
         n_pages_per_block = self['flash_config']['n_pages_per_block']
 
@@ -492,11 +495,16 @@ class ConfigNewFlash(Config):
 
         # change only n_blocks_per_plane
         fconf = self['flash_config']
+        # n_blocks_per_plane = nblocks / (fconf['n_planes_per_chip'] * \
+        #     fconf['n_chips_per_package'] * fconf['n_packages_per_channel'] * \
+        #     fconf['n_packages_per_channel'] * fconf['n_channels_per_dev'])
         n_blocks_per_plane = nblocks / (fconf['n_planes_per_chip'] * \
-            fconf['n_chips_per_package'] * fconf['n_packages_per_channel'] * \
-            fconf['n_packages_per_channel'] * fconf['n_channels_per_dev'])
+                            fconf['n_chips_per_package'] * fconf['n_packages_per_channel'] \
+                            * fconf['n_channels_per_dev'])
         assert n_blocks_per_plane > 0, 'n_blocks_per_plane must be larger' \
             'than zero. Not it is {}'.format(n_blocks_per_plane)
+
+        print 'The number of blocks in the flash is set to: ' + str(n_blocks_per_plane)
         fconf['n_blocks_per_plane'] = n_blocks_per_plane
 
     def byte_to_pagenum(self, offset, force_alignment = True):
@@ -540,6 +548,9 @@ class ConfigNewFlash(Config):
             npages = int(math.ceil(float(size) /
                 self['flash_config']['page_size']))
 
+            # print 'In off_size_to_page_range'
+            # print 'offset: ' + str(off) + ' size: ' + str(size)
+            # print 'start_page ' + str(start_page) + ' npages ' + str(npages)
             return start_page, npages
 
     def sec_ext_to_page_ext(self, sector, count):

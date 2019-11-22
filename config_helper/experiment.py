@@ -157,10 +157,12 @@ class Experiment(object):
             self.conf['ftl_type'] = 'nkftl2'
             self.conf['write_gc_log'] = self.para.write_gc_log
 
-            self.conf['nkftl']['n_blocks_in_data_group'] = \
-                self.para.segment_bytes / self.conf.block_bytes
-            self.conf['nkftl']['max_blocks_in_log_group'] = \
-                self.conf['nkftl']['n_blocks_in_data_group'] * self.para.log_group_factor
+            # self.conf['nkftl']['n_blocks_in_data_group'] = \
+            #     self.para.segment_bytes / self.conf.block_bytes
+            # self.conf['nkftl']['max_blocks_in_log_group'] = \
+            #     self.conf['nkftl']['n_blocks_in_data_group'] * self.para.log_group_factor
+            self.conf['nkftl']['n_blocks_in_data_group'] = 4
+            self.conf['nkftl']['max_blocks_in_log_group'] = 2
             print 'N:', self.conf['nkftl']['n_blocks_in_data_group']
             print 'K:', self.conf['nkftl']['max_blocks_in_log_group']
             self.conf['nkftl']['max_ratio_of_log_blocks'] = self.para.max_log_blocks_ratio
@@ -271,7 +273,8 @@ def get_shared_para_dict(expname, lbabytes):
             'segment_bytes'  : [2*MB],
             'max_log_blocks_ratio': [100],
             'n_online_cpus'  : ['all'],
-            'over_provisioning': [32], # 1.28 is a good number
+            #'over_provisioning': [32], # 1.28 is a good number
+            'over_provisioning': [1.28],
             'gc_high_ratio'    : [0.9],
             'gc_low_ratio'     : [0.0],
             'not_check_gc_setting': [True],

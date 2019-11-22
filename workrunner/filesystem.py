@@ -12,6 +12,9 @@ class LoopDevice(object):
         self.img_file = img_file
 
     def create(self):
+        print 'Creating the devices'
+        print str(self.dev_path)
+        print str(self.tmpfs_mount_point)
         fshelper.make_loop_device(self.dev_path, self.tmpfs_mount_point,
             self.size_mb, self.img_file)
 

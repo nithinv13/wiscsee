@@ -95,20 +95,45 @@ class TestUsingExistingTraceToSimulate(unittest.TestCase):
                 self.conf['lba_workload_configs']['ftlsim_event_path'] = \
                         self.para.ftlsim_path
 
-        para = experiment.get_shared_nolist_para_dict("test_exp_TestUsingExistingTraceToSimulate_jj23hx", 1*GB)
+        para = experiment.get_shared_nolist_para_dict("test_exp_TestUsingExistingTraceToSimulate_jj23hx", 1000*MB)
         para.update({
             'ftl': "nkftl2",
-            "mkfs_path": "../tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim-mkfs.txt",
-            "ftlsim_path": "../tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim.txt",
-            'n_channels_per_dev': 1,
-            'n_packages_per_channel': 2,
-            'n_chips_per_package': 2,
-            'n_planes_per_chip': 2,
+            "mkfs_path": "../tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim-mkfs-test.txt",
+            "ftlsim_path": "../tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim-test.txt",
+            # "mkfs_path": "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_processed_trace.txt",
+            # "ftlsim_path": "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_processed_trace.txt",
+            'n_channels_per_dev': 16,
+            'n_packages_per_channel': 1,
+            'n_chips_per_package': 1,
+            'n_planes_per_chip': 1,
             'n_pages_per_block': 64
             })
 
         Parameters = collections.namedtuple("Parameters", ','.join(para.keys()))
         obj = LocalExperiment( Parameters(**para) )
+        obj.main()
+
+class TestRedisWorkload(unittest.TestCase):
+    def test_run(self):
+        class LocalExperiment(experiment.Experiment):
+            def setup_workload(self):
+                self.conf['workload_class'] = "RedisWorkload"
+
+        para = experiment.get_shared_nolist_para_dict(expname="redis-workload",
+                                                      lbabytes=1024 * MB)
+        para.update(
+            {
+                'device_path': "/Users/nithinvenkatesh/Documents/IndependentStudy/dev/loop0",
+                "tmpfs_mount_point": "/Users/nithinvenkatesh/Documents/IndependentStudy/mnt/tmpfs",
+                'ftl': 'nkftl2',
+                'enable_simulation': True,
+                'dump_ext4_after_workload': True,
+                'only_get_traffic': False,
+                'trace_issue_and_complete': True,
+            })
+
+        Parameters = collections.namedtuple("Parameters", ','.join(para.keys()))
+        obj = LocalExperiment(Parameters(**para))
         obj.main()
 
 

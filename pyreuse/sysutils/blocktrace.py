@@ -320,4 +320,17 @@ def is_data_line(line):
     else:
         return True
 
+if __name__ == '__main__':
+    print 'coming into main'
+    resultpath = '/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_replica_raw_trace.txt'
+    to_ftlsim_path = '/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_replica_processed_trace.txt'
+    rawparser = BlktraceResult(512,
+                               ['pid', 'action', 'operation', 'offset', 'size',
+                                'timestamp', 'pre_wait_time', 'sync'],
+                               resultpath, to_ftlsim_path,
+                               padding_bytes=0,
+                               do_sort=True
+                               )
+    rawparser.create_event_file()
+
 

@@ -103,3 +103,18 @@ class SimpleRandReadWrite(Workload):
         # pass
 
 
+class RedisWorkload(Workload):
+    def __init__(self, confobj, workload_conf_key = None):
+        super(RedisWorkload, self).__init__(confobj, workload_conf_key)
+
+    def run(self):
+        mnt = self.conf["fs_mount_point"]
+        cmd = "./Users/nithinvenkatesh/Documents/IndependentStudy/YCSB/bin/ycsb load redis -s -P workloads/workloada -p redis.host=127.0.0.1 -p redis.port=6379 > outputLoad.txt"
+        print cmd
+        subprocess.call(cmd, shell=True)
+        subprocess.call("sync")
+
+    def stop(self):
+        pass
+
+
