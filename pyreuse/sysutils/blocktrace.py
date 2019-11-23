@@ -322,8 +322,12 @@ def is_data_line(line):
 
 if __name__ == '__main__':
     print 'coming into main'
-    resultpath = '/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_replica_raw_trace.txt'
-    to_ftlsim_path = '/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_replica_processed_trace.txt'
+    # print str(os.getcwd())
+    # print str(os.path.abspath(os.path.join(os.getcwd(), '../../tests/redis')))
+    # resultpath = '/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_replica_raw_trace.txt'
+    # to_ftlsim_path = '/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_replica_processed_trace.txt'
+    resultpath = '/users/nithinv/output.txt'
+    to_ftlsim_path = '/users/nithinv/workloadf_processed_trace.txt'
     rawparser = BlktraceResult(512,
                                ['pid', 'action', 'operation', 'offset', 'size',
                                 'timestamp', 'pre_wait_time', 'sync'],

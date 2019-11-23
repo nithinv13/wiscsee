@@ -80,7 +80,6 @@ def delLoopDev(devname):
 
 def isMounted(name):
     "only check is a name is in mounted list"
-    return True
     print str(name)
     name = name.rstrip('/')
     print "isMounted: name:", name

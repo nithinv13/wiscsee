@@ -1,4 +1,6 @@
+from collections import defaultdict
 import collections
+import pandas as pd
 import datetime
 import threading
 import json
@@ -57,18 +59,13 @@ class Recorder(object):
             'read_trans': 'background',
             'prog_trans': 'background'}
 
-        self.physical_page_reads = {}
-        self.physical_page_writes = {}
-        self.physical_block_erases = {}
-        self.physical_page_stats = collections.defaultdict(dict)
+        self.physical_page_stats = defaultdict(lambda: defaultdict(int))
+        self.pps_file = "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_stats_dftldes.csv"
 
-        self.writes_file_name = "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_physical_writes.txt"
-        self.reads_file_name = "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_physical_reads.txt"
-        self.erases_file_name = "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_physical_erases.txt"
-        # self.background_writer = threading.Thread(name='record_writer',
-        #                                           target=self.write_physical_rwe_stats_to_file)
-        # self.background_writer.daemon = True
-        # self.background_writer.start()
+        # # self.background_writer = threading.Thread(name='record_writer',
+        # #                                           target=self.write_physical_rwe_stats_to_file)
+        # # self.background_writer.daemon = True
+        # # self.background_writer.start()
 
     def close(self):
         self.__close_log_file()
@@ -256,35 +253,32 @@ class Recorder(object):
             self.__write_log('ERROR', *args)
 
     def record_physical_page_write(self, page_num):
-        if page_num in self.physical_page_writes:
-            self.physical_page_writes[page_num] += 1
-        else:
-            self.physical_page_writes[page_num] = 1
+        self.physical_page_stats[page_num]['w'] += 1
 
     def record_physical_page_read(self, page_num):
-        if page_num in self.physical_page_reads:
-            self.physical_page_reads[page_num] += 1
-        else:
-            self.physical_page_reads[page_num] = 1
+        self.physical_page_stats[page_num]['r'] += 1
 
+    def record_physical_page_erase(self, page_num):
+        self.physical_page_stats[page_num]['e'] += 1
 
-
-    def record_physical_block_erase(self, block_num):
-        if block_num in self.physical_block_erases:
-            self.physical_block_erases[block_num]  += 1
-        else:
-            self.physical_block_erases[block_num] = 1
 
     def _wirte_physical_page_stats_one_time(self):
-        with open(self.writes_file_name, 'w') as file1:
-            file1.write(' writes: ' + str(self.physical_page_writes))
-            file1.close()
-        with open(self.reads_file_name, 'w') as file1:
-            file1.write(' reads:' + str(self.physical_page_reads))
-            file1.close()
-        with open(self.erases_file_name, 'w') as file1:
-            file1.write(' erases:' + str(self.physical_block_erases))
-            file1.close()
+        ppndf = pd.DataFrame(columns=['ppn', 'writes', 'reads', 'erases'])
+        for ppn in self.physical_page_stats:
+            writes = self.physical_page_stats[ppn]['w']
+            reads = self.physical_page_stats[ppn]['r']
+            erases = self.physical_page_stats[ppn]['e']
+            ppndf = ppndf.append({'ppn': ppn, 'writes': writes, 'reads': reads, 'erases': erases}, ignore_index=True)
+        ppndf.to_csv(self.pps_file, sep=',', index=False)
+        # with open(self.writes_file_name, 'w') as file1:
+        #     file1.write(' writes: ' + str(self.physical_page_writes))
+        #     file1.close()
+        # with open(self.reads_file_name, 'w') as file1:
+        #     file1.write(' reads:' + str(self.physical_page_reads))
+        #     file1.close()
+        # with open(self.erases_file_name, 'w') as file1:
+        #     file1.write(' erases:' + str(self.physical_block_erases))
+        #     file1.close()
 
     def write_physical_rwe_stats_to_file(self):
         time_stamp = 1

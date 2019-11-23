@@ -97,11 +97,14 @@ class TestUsingExistingTraceToSimulate(unittest.TestCase):
 
         para = experiment.get_shared_nolist_para_dict("test_exp_TestUsingExistingTraceToSimulate_jj23hx", 1000*MB)
         para.update({
-            'ftl': "nkftl2",
-            "mkfs_path": "../tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim-mkfs-test.txt",
-            "ftlsim_path": "../tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim-test.txt",
-            # "mkfs_path": "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_processed_trace.txt",
-            # "ftlsim_path": "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_processed_trace.txt",
+            'ftl': "dftldes",
+            #'ftl': "nkftl2",
+            # "mkfs_path": "../tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim-mkfs-test.txt",
+            # "ftlsim_path": "../tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim-test.txt",
+            "mkfs_path": "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_processed_trace.txt",
+            "ftlsim_path": "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_processed_trace.txt",
+            # "mkfs_path": "../tests/testdata/redis/workloadf/blkparse-events-for-ftlsim-mkfs.txt",
+            # "ftlsim_path": "../tests/testdata/redis/workloadf/blkparse-events-for-ftlsim.txt",
             'n_channels_per_dev': 16,
             'n_packages_per_channel': 1,
             'n_chips_per_package': 1,
@@ -117,6 +120,7 @@ class TestRedisWorkload(unittest.TestCase):
     def test_run(self):
         class LocalExperiment(experiment.Experiment):
             def setup_workload(self):
+                self.conf['age_workload_class'] = "RedisWorkload"
                 self.conf['workload_class'] = "RedisWorkload"
 
         para = experiment.get_shared_nolist_para_dict(expname="redis-workload",

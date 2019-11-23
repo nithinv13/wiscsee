@@ -154,6 +154,10 @@ class Controller(object):
         """
         page = block * self.n_pages_per_block
 
+        # Physical block erases are recorded here
+        for ppn in range(page, page+self.n_pages_per_block):
+            self.recorder.record_physical_page_erase(ppn)
+
         addr = self.physical_to_machine_page(page)
         addr.page = None # so we dont' mistakely use it for other purposes
 
@@ -296,6 +300,12 @@ class Controller3(Controller):
         """
         op is 'read' or 'write'
         """
+        for ppn in range(ppn_start, ppn_start+ppn_count):
+            if op == 'read':
+                self.recorder.record_physical_page_read(ppn)
+            elif op == 'write':
+                self.recorder.record_physical_page_write(ppn)
+
         flash_reqs = self.get_flash_requests_for_ppns(ppn_start, ppn_count,
             op = op)
         yield self.env.process( self.execute_request_list(flash_reqs, tag) )
