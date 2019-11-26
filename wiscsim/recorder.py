@@ -32,11 +32,13 @@ class Recorder(object):
     def __init__(self, output_target,
             output_directory = None,
             verbose_level = 1,
-            print_when_finished = False):
+            print_when_finished = False,
+            pps_output_file="/Users/nithinvenkatesh/Documents/IndependentStudy/redis/json_dump_test.txt"):
         self.output_target = output_target
         self.output_directory = output_directory
         self.verbose_level = verbose_level
         self.print_when_finished = print_when_finished
+        self.pps_output_file = pps_output_file
 
         assert len(self.output_target) > 0
 
@@ -60,7 +62,6 @@ class Recorder(object):
             'prog_trans': 'background'}
 
         self.physical_page_stats = defaultdict(lambda: defaultdict(int))
-        self.pps_file = "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_stats_dftldes.csv"
 
         # # self.background_writer = threading.Thread(name='record_writer',
         # #                                           target=self.write_physical_rwe_stats_to_file)
@@ -253,23 +254,26 @@ class Recorder(object):
             self.__write_log('ERROR', *args)
 
     def record_physical_page_write(self, page_num):
-        self.physical_page_stats[page_num]['w'] += 1
+        self.physical_page_stats['w'][page_num] += 1
 
     def record_physical_page_read(self, page_num):
-        self.physical_page_stats[page_num]['r'] += 1
+        self.physical_page_stats['r'][page_num] += 1
 
     def record_physical_page_erase(self, page_num):
-        self.physical_page_stats[page_num]['e'] += 1
+        self.physical_page_stats['e'][page_num] += 1
 
 
     def _wirte_physical_page_stats_one_time(self):
-        ppndf = pd.DataFrame(columns=['ppn', 'writes', 'reads', 'erases'])
-        for ppn in self.physical_page_stats:
-            writes = self.physical_page_stats[ppn]['w']
-            reads = self.physical_page_stats[ppn]['r']
-            erases = self.physical_page_stats[ppn]['e']
-            ppndf = ppndf.append({'ppn': ppn, 'writes': writes, 'reads': reads, 'erases': erases}, ignore_index=True)
-        ppndf.to_csv(self.pps_file, sep=',', index=False)
+        with open(self.pps_output_file, 'w') as fp:
+            json.dump(self.physical_page_stats, fp)
+
+        # ppndf = pd.DataFrame(columns=['ppn', 'writes', 'reads', 'erases'])
+        # for ppn in self.physical_page_stats:
+        #     writes = self.physical_page_stats[ppn]['w']
+        #     reads = self.physical_page_stats[ppn]['r']
+        #     erases = self.physical_page_stats[ppn]['e']
+        #     ppndf = ppndf.append({'ppn': ppn, 'writes': writes, 'reads': reads, 'erases': erases}, ignore_index=True)
+        # ppndf.to_csv(self.pps_file, sep=',', index=False)
         # with open(self.writes_file_name, 'w') as file1:
         #     file1.write(' writes: ' + str(self.physical_page_writes))
         #     file1.close()

@@ -53,8 +53,8 @@ class Simulator(object):
         self.recorder = recorder.Recorder(output_target = self.conf['output_target'],
             output_directory = self.conf['result_dir'],
             verbose_level = self.conf['verbose_level'],
-            print_when_finished = self.conf['print_when_finished']
-            )
+            print_when_finished = self.conf['print_when_finished'],
+            pps_output_file=self.conf['pps_output_file'])
 
         if self.conf.has_key('enable_e2e_test'):
             raise RuntimeError("enable_e2e_test is deprecated")

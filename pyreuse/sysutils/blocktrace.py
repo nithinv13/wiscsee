@@ -2,7 +2,7 @@ import os
 import re
 import subprocess
 import time
-
+import argparse
 from pyreuse.helpers import *
 from pyreuse.macros import *
 
@@ -322,16 +322,17 @@ def is_data_line(line):
 
 if __name__ == '__main__':
     print 'coming into main'
-    # print str(os.getcwd())
-    # print str(os.path.abspath(os.path.join(os.getcwd(), '../../tests/redis')))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--epochs", type=int, default=2, help="Number of iterations to run the algorithm")
+    parser.add_argument('--output_file', type=str, default='/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_replica_processed_trace.txt')
+    parser.add_argument('--input_file', type=str, default='/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_replica_raw_trace.txt')
+    args, unknown = parser.parse_known_args()
     # resultpath = '/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_replica_raw_trace.txt'
     # to_ftlsim_path = '/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_replica_processed_trace.txt'
-    resultpath = '/users/nithinv/output.txt'
-    to_ftlsim_path = '/users/nithinv/workloadf_processed_trace.txt'
     rawparser = BlktraceResult(512,
                                ['pid', 'action', 'operation', 'offset', 'size',
                                 'timestamp', 'pre_wait_time', 'sync'],
-                               resultpath, to_ftlsim_path,
+                               args.input_file, args.output_file,
                                padding_bytes=0,
                                do_sort=True
                                )

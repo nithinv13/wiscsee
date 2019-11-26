@@ -348,7 +348,11 @@ class Config(dict):
 
             ############# OS #####################
             "linux_version": utils.linux_kernel_version(),
-            "n_online_cpus": 'all'
+            "n_online_cpus": 'all',
+
+
+            ############## MISC #################
+            "pps_output_file": ""
         }
 
         return confdic
