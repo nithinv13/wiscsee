@@ -1,10 +1,15 @@
 import os
 import re
+import sys
+sys.path.append('/users/nithinv/wiscsee/pyreuse/')
+sys.path.insert(0,'../..')
 import subprocess
 import time
 import argparse
 from pyreuse.helpers import *
 from pyreuse.macros import *
+
+
 
 class BlktraceResult(object):
     """

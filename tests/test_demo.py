@@ -94,16 +94,16 @@ class TestUsingExistingTraceToSimulate(unittest.TestCase):
                         self.para.mkfs_path
                 self.conf['lba_workload_configs']['ftlsim_event_path'] = \
                         self.para.ftlsim_path
-                self.conf['pps_output_file'] = '/Users/nithinvenkatesh/Documents/IndependentStudy/redis/json_dump_test1.txt'
+                self.conf['pps_output_file'] = '/users/nithinv/pps_output.txt'
 
-        para = experiment.get_shared_nolist_para_dict("test_exp_TestUsingExistingTraceToSimulate_jj23hx", 1000*MB)
+        para = experiment.get_shared_nolist_para_dict("test_exp_TestUsingExistingTraceToSimulate_jj23hx", 16000*MB)
         para.update({
-            #'ftl': "dftldes",
-            'ftl': "nkftl2",
-            "mkfs_path": "../tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim-mkfs-test.txt",
-            "ftlsim_path": "../tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim-test.txt",
-            # "mkfs_path": "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_processed_trace.txt",
-            # "ftlsim_path": "/Users/nithinvenkatesh/Documents/IndependentStudy/redis/workloadf_processed_trace.txt",
+            'ftl': "dftldes",
+            #'ftl': "nkftl2",
+            #"mkfs_path": "../tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim-mkfs-test.txt",
+            #"ftlsim_path": "../tests/testdata/sqlitewal-update/subexp-7928737328932659543-ext4-10-07-23-50-10--2726320246496492803/blkparse-events-for-ftlsim-test.txt",
+            "mkfs_path": "/users/nithinv/cassandra_workloadc_run.txt",
+            "ftlsim_path": "/users/nithinv/cassandra_workloadc_run.txt",
             # "mkfs_path": "../tests/testdata/redis/workloadf/blkparse-events-for-ftlsim-mkfs.txt",
             # "ftlsim_path": "../tests/testdata/redis/workloadf/blkparse-events-for-ftlsim.txt",
             'n_channels_per_dev': 16,
